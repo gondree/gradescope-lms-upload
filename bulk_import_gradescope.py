@@ -128,13 +128,16 @@ if __name__ == '__main__':
     parser = OptionParser(description='Perform gradescope analysis.')
     parser.add_option("--csv", metavar="PATH", type=str, 
         dest='csv_path', default=None,
-        help="path to directory holding CSV data (Moodle file to be modified with grdes).")
+        help="path to file holding CSV data (Moodle file to be modified with grades).")
     parser.add_option("--yml", metavar="PATH", type=str, 
         dest='yml_path', default=None,
-        help="path to directory holding YML data (Gradescope file holding data, in the same directory as PDF submissions from gradescope).")
+        help="path to file holding YML data (Gradescope file holding data, in the same directory as PDF submissions from gradescope).")
 
     (opt, args) = parser.parse_args()
     OPT = opt
+    
+    if opt.yml_path is None or opt.csv_path is None:
+        sys.exit("Missing arguments. Run with -h for usage.")
 
     yml_data = yml_parse(opt.yml_path)
     csv_data = csv_parse(opt.csv_path)
