@@ -3,56 +3,8 @@ from pprint import pprint
 from optparse import OptionParser
 
 
-def open_xml(path, records):
-    import openpyxl   # pip install openpyxl
-
-    wb = openpyxl.load_workbook(path, data_only=True)
-    ws = wb.active
-
-    meta = ''
-    done = False
-
-    # get the activity name (meta) and the student names
-    for cell in ws.columns[0]:
-        if cell.value == 'Student Names' or cell.value == 'Class Scoring':
-            done = True
-            continue
-        elif not done:
-            if cell.value != None:
-                if meta != '':
-                    meta += ', '
-                meta += str(cell.value)
-            continue
-
-        name = cell.value
-        if not name in records.keys():
-            records[name] = {}
-        if not meta in records[name].keys():
-            records[name][meta] = {'total': 0}
-
-    # for each student, get each click
-    for r in ws.rows[8:]:
-        name = None
-        cell = r[0]
-        if name is None and cell.value in records.keys():
-            name = cell.value
-        if name is None:
-            continue
-        for cell in r[3:]:
-            if cell.value != None:
-                records[name][meta][cell.column] = 1
-
-    # add up all the clicks
-    for name in records.keys():
-        if meta in records[name].keys():
-            records[name][meta]['total'] = len(
-                [k for k in records[name][meta].keys() if k != 'total'])
-            if records[name][meta]['total'] == 0:
-                del records[name][meta]
-
-
 def yml_parse(path):
-    import yaml, io
+    import yaml
 
     with open(path, 'r') as stream:
         data_loaded = yaml.load(stream)
