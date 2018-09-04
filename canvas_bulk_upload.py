@@ -70,7 +70,7 @@ if __name__ == '__main__':
         print("\t Uploading feedback:", data[sid]['path'])
         
         result, response = submission.upload_comment(data[sid]['path'])
-        print(response)
+        #print(response)
         if not result:
             print("Failed to set grade:", response, file=sys.stderr)
             exit(1)
