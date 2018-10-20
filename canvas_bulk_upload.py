@@ -74,4 +74,4 @@ if __name__ == '__main__':
         if not result:
             print("Failed to set grade:", response, file=sys.stderr)
             exit(1)
-        
+
