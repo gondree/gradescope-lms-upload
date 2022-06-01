@@ -1,38 +1,31 @@
-import os
+#!/usr/bin/env python3
+
+import sys, os, yaml
 from argparse import ArgumentParser
 from canvasapi import Canvas
 
-
 def yml_parse(path):
-    import yaml
-
     with open(path, 'r') as stream:
         data_loaded = yaml.load(stream)
         return data_loaded
     return None
 
-
 if __name__ == '__main__':
     SCRIPTPATH = os.path.dirname(os.path.abspath(__file__))
 
-    parser = ArgumentParser(description='Upload Gradescope data to canvas')    
-    parser.add_argument("--yml", metavar='PATH', type=str, 
+    parser = ArgumentParser(description='Upload Gradescope data to canvas')
+    parser.add_argument("--yml", metavar='PATH', type=str,
         dest='yml', default=None, required=True,
         help="path to file holding YML data (Gradescope file holding data, in the same directory as PDF submissions from gradescope).")
-    parser.add_argument("--ASSIGNMENT_ID", type=int, 
-        dest='ASSIGNMENT_ID', default=None, required=True,
-        help="Canvas Assignment ID")
-    parser.add_argument("--COURSE_ID", type=int, 
-        dest='COURSE_ID', default=None, required=True,
-        help="Canvas Course ID")
-    parser.add_argument("--API_URL", type=str, 
-        dest='API_URL', default=None, required=True,
-        help="Canvas API URL")
-    parser.add_argument("--API_KEY", type=str, 
-        dest='API_KEY', default=None, required=True,
-        help="Canvas API URL")
-
     OPT = vars(parser.parse_args())
+
+    # get options from the yml config file
+    try:
+        with open(OPT['config'], 'r') as file:
+            config = yaml.load(file)
+            OPT.update(config)
+    except yaml.YAMLError as e:
+        print("Error in configuration file:", e)
 
     # open up the YML
     yml_data = yml_parse(OPT['yml'])
@@ -58,8 +51,8 @@ if __name__ == '__main__':
     print("Muted assignment")
 
     for sid in data:
+        print("For student '"+data[sid]['name']+"'", "("+sid+")")
         submission = assignment.get_submission(sid)
-        print("For student '"+data[sid]['name']+"'")
 
         print("\t Setting score:", data[sid]['score'])
         result = submission.edit(submission={'posted_grade': data[sid]['score']})
@@ -68,10 +61,9 @@ if __name__ == '__main__':
             exit(1)
 
         print("\t Uploading feedback:", data[sid]['path'])
-        
+
         result, response = submission.upload_comment(data[sid]['path'])
         #print(response)
         if not result:
             print("Failed to set grade:", response, file=sys.stderr)
             exit(1)
-
