@@ -14,6 +14,9 @@ if __name__ == '__main__':
     SCRIPTPATH = os.path.dirname(os.path.abspath(__file__))
 
     parser = ArgumentParser(description='Upload Gradescope data to canvas')
+    parser.add_argument("--config", type=str,
+        dest='config', required=True,
+        help="Path to YAML confgig file")
     parser.add_argument("--yml", metavar='PATH', type=str,
         dest='yml', default=None, required=True,
         help="path to file holding YML data (Gradescope file holding data, in the same directory as PDF submissions from gradescope).")
